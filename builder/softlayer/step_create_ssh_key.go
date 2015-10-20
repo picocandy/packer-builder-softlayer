@@ -33,6 +33,10 @@ func (self *stepCreateSshKey) Run(state multistep.StateBag) multistep.StepAction
 
 		state.Put("ssh_private_key", string(privateKeyBytes))
 
+		// Provision with  ssh_key_id if specified
+		config := state.Get("config").(Config)
+		state.Put("ssh_key_id", config.SSHKeyID)
+
 		return multistep.ActionContinue
 	}
 
