@@ -50,6 +50,16 @@ func (self *stepCreateInstance) Run(state multistep.StateBag) multistep.StepActi
 	self.instanceId = instanceData["globalIdentifier"].(string)
 	ui.Say(fmt.Sprintf("Created instance, id: '%s'", instanceData["globalIdentifier"].(string)))
 
+	// Tag instance if required
+	if config.Tags != "" {
+		err := client.TagInstance(self.instanceId, config.Tags)
+		if err != nil {
+			ui.Error(err.Error())
+			state.Put("error", err)
+			return multistep.ActionHalt
+		}
+	}
+
 	return multistep.ActionContinue
 }
 

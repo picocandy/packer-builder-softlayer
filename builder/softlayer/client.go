@@ -192,10 +192,10 @@ func (self SoftlayerClient) doHttpRequest(path string, requestType string, reque
 			return nil, err
 		}
 
-		return []interface{} {v,}, nil
+		return []interface{}{v}, nil
 
 	case nil:
-		return []interface{} {nil,}, nil	
+		return []interface{}{nil}, nil
 	default:
 		return nil, errors.New("Unexpected type in HTTP response")
 	}
@@ -329,7 +329,7 @@ func (self SoftlayerClient) getBlockDevices(instanceId string) ([]interface{}, e
 	return data, nil
 }
 
-func (self SoftlayerClient) findNonSwapBlockDeviceIds(blockDevices []interface{}) ([]int64) {
+func (self SoftlayerClient) findNonSwapBlockDeviceIds(blockDevices []interface{}) []int64 {
 	blockDeviceIds := make([]int64, len(blockDevices))
 	deviceCount := 0
 
@@ -378,9 +378,8 @@ func (self SoftlayerClient) findImageIdByName(imageName string) (string, error) 
 		return "", err
 	}
 
-	return imageId, nil;
+	return imageId, nil
 }
-
 
 func (self SoftlayerClient) captureStandardImage(instanceId string, imageName string, imageDescription string, blockDeviceIds []int64) (map[string]interface{}, error) {
 	blockDevices := make([]*BlockDevice, len(blockDeviceIds))
@@ -494,4 +493,22 @@ func (self SoftlayerClient) waitForInstanceReady(instanceId string, timeout time
 		err := fmt.Errorf("Timeout while waiting to for the instance to become ready")
 		return err
 	}
+}
+
+func (self SoftlayerClient) TagInstance(instanceId string, tags string) (err error) {
+	requestBody, err := self.generateRequestBody(tags)
+	if err != nil {
+		return err
+	}
+
+	response, err := self.doRawHttpRequest(fmt.Sprintf("SoftLayer_Virtual_Guest/%s/setTags.json", instanceId), "POST", requestBody)
+	if err != nil {
+		return err
+	}
+
+	if res := string(response[:]); res != "true" {
+		return errors.New(fmt.Sprintf("Failed to tag instance with id '%s', got '%s' as response from the API.", instanceId, res))
+	}
+
+	return nil
 }

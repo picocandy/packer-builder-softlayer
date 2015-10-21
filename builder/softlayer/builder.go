@@ -40,7 +40,8 @@ type Config struct {
 	RawStateTimeout string `mapstructure:"instance_state_timeout"`
 	StateTimeout    time.Duration
 
-	SSHKeyID int64 `mapstructure:"ssh_key_id"`
+	SSHKeyID int64  `mapstructure:"ssh_key_id"`
+	Tags     string `mapstructure:"tags"`
 
 	ctx interpolate.Context
 }
